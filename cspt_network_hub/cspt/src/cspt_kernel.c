@@ -578,8 +578,10 @@ int32 cmdtable_create(void *message_ptr)
     {
         cmd_table.command_info_arr[index].command_id =
                 command_table_ptr->command_info_arr[index].command_id;
+        // this value passed from remote call is the array index of command
+        // mapping table. Convert it into function pointers at here.
         cmd_table.command_info_arr[index].command_func =
-                g_command_mapping_table_arr[(uint32) command_table_ptr->command_info_arr[index].command_func].cmdFunc;
+                g_command_mapping_table_arr[(uint64) command_table_ptr->command_info_arr[index].command_func].cmdFunc;
         cmd_table.command_info_arr[index].arg_num =
                 command_table_ptr->command_info_arr[index].arg_num;
         for (arg_index = 0;
