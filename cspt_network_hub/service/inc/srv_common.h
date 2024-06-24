@@ -12,6 +12,8 @@ typedef unsigned long long int service_handle;
 
 #define SRV_INVALID 0xffffffff
 
+typedef unsigned long long int uint64;
+typedef long long int  int64;
 typedef unsigned int   uint32;
 typedef int            int32;
 typedef unsigned short uint16;
