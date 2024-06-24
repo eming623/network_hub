@@ -41,6 +41,11 @@ command_mapping_info g_command_mapping_table_arr[] =
 { 5, kernel_operation } //include + - * / % > <
 };
 
+/*
+   Listen to input message from client. The pre-compiled messages must be
+   compiled to binary format which is strictly aligned to the table/message
+   definitions.
+ */
 void* kernel_entry(void *arg)
 {
     printf("%s-%u:Enter kernel_entry\r\n", __FILE__, __LINE__);
@@ -58,6 +63,8 @@ void* kernel_entry(void *arg)
         message_header_ptr = (tcp_client_message_header_s*) message_ptr;
         printf("--=== Message type = %d ===-- \n",
                 message_header_ptr->message_type);
+        // The highest 8 bit of message header decide if the message is a
+        // pre-compiled message data, or a signal to start the application.
         switch (message_header_ptr->message_type & 0xFF000000)
         {
         case KERNEL_MSG_PRECOMPILE:
@@ -70,7 +77,7 @@ void* kernel_entry(void *arg)
             }
             srv_msg_free(message_ptr);
             break;
-
+        // The application start signal.
         case KERNEL_MSG_RUN:
             if (SRV_OK != case_run(((case_run_s*) message_ptr)->command_id))
             {
@@ -85,6 +92,9 @@ void* kernel_entry(void *arg)
     return NULL;
 }
 
+/*
+   The function dispatch pre-compiled messages for further processing.
+ */
 int32 precompile(void *message_ptr, uint32 message_type)
 {
     printf("--=== message_type=%d ===-- \n", message_type);
@@ -125,6 +135,10 @@ int32 precompile(void *message_ptr, uint32 message_type)
     }
     return SRV_OK;
 }
+
+/*
+   Remove sockets FD in receiving nodes from epoll listening set and close them.
+ */
 
 int32 nodetable_cleanup()
 {
@@ -174,6 +188,10 @@ int32 nodetable_cleanup()
     return SRV_OK;
 }
 
+/*
+   Create a UDP socket and bind IP/Port information to it.
+ */
+
 int32 create_bind_socket(uint32 ip_addr, uint16 port)
 {
     int32 socket_handle;
@@ -222,6 +240,11 @@ uint32 find_node_by_ip_port(uint32 start, uint32 end, uint32 ip_addr,
     }
     return SRV_INVALID;
 }
+
+/*
+   Create node map based on input from client which contains IP/Port information
+   from all sending and receiving addresses.
+ */
 
 int32 nodetable_create(void *message_ptr)
 {
@@ -374,6 +397,11 @@ int32 nodetable_create(void *message_ptr)
     return SRV_OK;
 }
 
+/*
+   Create a database for variables with its location/size in original network
+   messages.
+ */
+
 int32 vartable_create(void *message_ptr)
 {
     uint32 index;
@@ -454,6 +482,12 @@ int32 vartable_create(void *message_ptr)
     printf("%s-%u:Variable table create succeed\r\n", __FILE__, __LINE__);
     return SRV_OK;
 }
+
+/*
+   Create a database for application protocol messages. The messages are
+   strictly align to its protocol format. The fields in the messages are
+   doubleword (32bit) aligned.
+ */
 
 int32 imagetable_create(void *message_ptr)
 {
@@ -549,6 +583,10 @@ int32 add_msg(void *message_ptr)
     return SRV_OK;
 }
 
+/*
+   Build command table from client input.
+ */
+
 int32 cmdtable_create(void *message_ptr)
 {
     uint32 index;
@@ -578,8 +616,8 @@ int32 cmdtable_create(void *message_ptr)
     {
         cmd_table.command_info_arr[index].command_id =
                 command_table_ptr->command_info_arr[index].command_id;
-        // this value passed from remote call is the array index of command
-        // mapping table. Convert it into function pointers at here.
+        // this value passed from remote call is the array index. Convert it
+        // into function pointers at here.
         cmd_table.command_info_arr[index].command_func =
                 g_command_mapping_table_arr[(uint64) command_table_ptr->command_info_arr[index].command_func].cmdFunc;
         cmd_table.command_info_arr[index].arg_num =
@@ -602,6 +640,11 @@ int32 cmdtable_create(void *message_ptr)
     printf("%s-%u:Command table create succeed\r\n", __FILE__, __LINE__);
     return SRV_OK;
 }
+
+/*
+   The trigger to start the application. Started from the first command and find
+   the next according to command table definition and command execution result.
+ */
 
 int32 case_run(uint32 command_id)
 {
@@ -731,6 +774,12 @@ uint32 kernel_send(void *arg_ptr)
 
     return command_info_ptr->true_next_command_id;
 }
+
+/*
+   A function to wait and check received messages from peer node of the
+   application. The peer node should be a real implementation of application
+   protocols (i.e. mosquitto.org for MQTT).
+ */
 
 uint32 kernel_wait(void *arg_ptr)
 {
@@ -953,6 +1002,11 @@ uint32 kernel_wait(void *arg_ptr)
     }
 }
 
+/*
+   Check fields in received messages by its offset and length. Expectation value
+   is configured from client side. If the expectation is not aligned, report error.
+ */
+
 int32 keyie_cmp(void *message_ptr, uint32 key_size, uint32 var_id)
 {
 
@@ -1084,6 +1138,19 @@ int32 keyie_cmp(void *message_ptr, uint32 key_size, uint32 var_id)
 
     return SRV_ERR;
 }
+
+/*
+   The implementation of "IF" and "For" logic in protocol applications.
+   "IF" and "For" are translated into "GOTO" function which returns the next
+   command ID.
+
+   "IF" takes a condition input with boolean type result. Different command ID
+   will returned when the condition is "TRUE" or "FALSE".
+
+   "FOR" takes a counter input which decrement in every execution. Before the
+   counter reaches 0, it always returns next command ID as itself. When the
+   counter reaches 0, it returns the next command after the loop.
+ */
 
 uint32 kernel_goto(void *arg_ptr)
 {
@@ -1221,6 +1288,11 @@ uint32 kernel_goto(void *arg_ptr)
     return SRV_INVALID;
 }
 
+/*
+   Sleep action from application layer. The main thread will hang-up.
+   The input is in milliseconds
+ */
+
 uint32 kernel_sleep(void *arg_ptr)
 {
     uint32 time_ms; //millisecond
@@ -1252,6 +1324,11 @@ uint32 kernel_sleep(void *arg_ptr)
 
     return command_info_ptr->true_next_command_id;
 }
+
+/*
+   Populate values into management variables for further usage. The value can be
+   populated from input, or read from a field in messages replied from peer nodes.
+ */
 
 uint32 kernel_evaluate(void *arg_ptr)
 {
@@ -1386,6 +1463,9 @@ uint32 kernel_evaluate(void *arg_ptr)
         return SRV_INVALID;
     }
 }
+/*
+   '+', '-', '*', '/', '%', '<', '>' operations to given fields.
+ */
 
 uint32 kernel_operation(void *arg_ptr)
 {
