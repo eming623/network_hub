@@ -5,3 +5,13 @@ This is a protocol definition and verification framework for network protocols i
 ## Authors
 - [@eming623](https://github.com/eming623)
 
+## Usage/Examples
+
+```shell
+$cd cspt_network_hub/Debug
+$make cspt_network_hub
+$./cspt_network_hub
+```
+
+Enjoy!
+
