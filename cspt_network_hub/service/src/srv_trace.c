@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   The implementaiton of trace service to application layer
  */
 
 #include <stdio.h>

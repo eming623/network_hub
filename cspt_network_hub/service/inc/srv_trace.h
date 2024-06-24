@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   Provides trace service API to application layer
  */
 
 #ifndef SRV_TRACE_H_

@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 16, 2014
  *      Author: Yiming Xu
+ *
+   Data type definition for all modules/applications in this project.
  */
 
 #ifndef SRV_COMMON_H_

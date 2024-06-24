@@ -5,6 +5,10 @@
  *      Author: Yiming Xu
  */
 
+/*
+   The implementation of management operations for application layer.
+ */
+
 #include <stdio.h>
 #include "srv_task.h"
 #include "srv_buffer.h"

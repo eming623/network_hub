@@ -3,6 +3,10 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   A implementation of manage management for upper layer application.
+   This module allocate a memory pool in initialization in one time. All memory
+   allocate/free by this API is using memory from the memory pool.
  */
 
 #include <stdlib.h>

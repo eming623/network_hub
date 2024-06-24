@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   A service API wrapper for task operations in pthread library.
  */
 
 #include <pthread.h>

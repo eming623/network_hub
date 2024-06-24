@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   Bitmap service implementation for upper layer applications.
  */
 
 #include <stdio.h>
@@ -20,7 +22,8 @@ service_handle srv_bmp_create(int32 bit_num)
 	((bit_num % SRV_BMP_BITS) == 0) ?
 			(size = bit_num / SRV_BMP_BITS) :
 			(size = bit_num / SRV_BMP_BITS + 1);
-
+    // Memory management module has dependency to bitmap service. This function
+	// need to be called before memory management module, so it uses raw malloc.
 	bitmap_ptr = (uint32*) malloc(size * sizeof(uint32));
 	if (bitmap_ptr == NULL)
 		return SRV_INVALID;

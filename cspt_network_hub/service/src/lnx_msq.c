@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   A message queue implementation for upper layer applications.
  */
 
 #include <pthread.h>

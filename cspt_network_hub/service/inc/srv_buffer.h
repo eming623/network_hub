@@ -3,6 +3,8 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   Provides memory management operation APIs to application layer.
  */
 
 #ifndef SRV_BUFFER_H_

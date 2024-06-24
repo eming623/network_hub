@@ -3,6 +3,9 @@
  *
  *  Created on: Aug 17, 2014
  *      Author: Yiming Xu
+ *
+   A service API wrapper for Linux socket programming functions.
+   Support TCP/UDP protocols in AF_INET family.
  */
 
 #ifndef SRV_SOCKET_H_
