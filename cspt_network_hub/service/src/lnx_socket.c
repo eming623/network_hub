@@ -102,7 +102,7 @@ service_handle srv_skt_accept(service_handle socket_handle,
 {
 	int32 client_socket;
 	struct sockaddr_in sin;
-	int32 sinlen = sizeof(sin);
+	socklen_t sinlen = sizeof(sin);
 
 	if (socket_handle == SRV_INVALID || addr_ptr == NULL)
 		return SRV_INVALID;
@@ -173,7 +173,7 @@ int32 srv_skt_recvfrom(service_handle socket_handle, char *buf_ptr, int32 len,
 		srv_socket_addr_s *addr_ptr)
 {
 	struct sockaddr_in sin;
-	int32 sinlen = sizeof(sin);
+	socklen_t sinlen = sizeof(sin);
 	int32 rcv_size;
 
 	if (socket_handle == SRV_INVALID || buf_ptr == NULL)
