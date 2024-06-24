@@ -8,7 +8,7 @@
 #ifndef SRV_COMMON_H_
 #define SRV_COMMON_H_
 
-typedef unsigned int service_handle;
+typedef unsigned long long int service_handle;
 
 #define SRV_INVALID 0xffffffff
 
